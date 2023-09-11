@@ -1,4 +1,7 @@
+// Add imports above this line
 import { galleryItems } from './gallery-items';
+// Change code below this line
+
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import '../css/common.css';
@@ -29,4 +32,4 @@ alleryContainerEl.addEventListener('click', event => {
   }
 });
 
-//console.log(galleryItems);
+// console.log(galleryItems);
