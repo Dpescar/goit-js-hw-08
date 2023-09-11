@@ -1,41 +1,32 @@
-// Add imports above this line
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css'; // Importăm și CSS-ul
 import { galleryItems } from './gallery-items';
-// Change code below this line
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import '../css/common.css';
+import '../css/01-gallery.css';
 
-import { galleryItems } from './gallery-items.js';
+const createItemsMarkup = galleryItems
+  .map(({ preview, original, description }) => {
+    return `
+    <a class="gallery__item" href="${original}">
+    <img class="gallery__image" src="${preview}" alt="${description}" />
+  </a>
+      `;
+  })
+  .join('');
 
-document.addEventListener('DOMContentLoaded', function () {
-  const listEl = document.querySelector('.gallery');
-
-  // Setez listStyle la "none" pentru a elimina marcajele de listă (bulinele)
-  listEl.style.listStyle = 'none';
-
-  // Creez elemente 'li' pentru fiecare element din galleryItems
-  galleryItems.forEach(item => {
-    const listItemEl = document.createElement('li');
-    listItemEl.classList.add('gallery__item');
-    listItemEl.innerHTML = `<a class="gallery__link" href="${item.original}">
-      <img
-        class="gallery__image"
-        src="${item.preview}"
-        alt="${item.description}"
-      />
-    </a>`;
-    listEl.appendChild(listItemEl);
-  });
-
-  const lightbox = new SimpleLightbox('.gallery a', {
-    captionsData: 'alt',
-    captionDelay: 250,
-  });
-
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && lightbox) {
-      lightbox.close();
-    }
-  });
-
-  console.log(galleryItems);
+const alleryContainerEl = document.querySelector('.gallery');
+alleryContainerEl.insertAdjacentHTML('beforeend', createItemsMarkup);
+let lightbox = new SimpleLightbox('.gallery a', {
+  scrollZoom: false,
+  captionDelay: 250,
+  captionsData: 'alt',
+  doubleTapZoom: 1,
 });
+alleryContainerEl.addEventListener('click', event => {
+  event.preventDefault();
+  if (!event.target.classList.contains('gallery__image')) {
+    return;
+  }
+});
+
+//console.log(galleryItems);

@@ -1,67 +1,104 @@
+import '../css/common.css';
+import '../css/03-feedback.css';
 import throttle from 'lodash.throttle';
 
-// task 1: Salvăm starea formularului în local storage la fiecare modificare a câmpurilor "email" și "message"
-const emailInput = document.querySelector('input[name="email"]');
-const messageTextarea = document.querySelector('textarea[name="message"]');
+const STORAGE_KEY = 'feedback-form-state';
+const refs = {
+  form: document.querySelector('.feedback-form'),
+  textarea: document.querySelector('.feedback-form textarea'),
+  input: document.querySelector('input'),
+};
+const formData = {};
 
-function saveFormState() {
-  // Salvăm valorile câmpurilor într-un obiect
-  const formState = {
-    email: emailInput.value,
-    message: messageTextarea.value,
-  };
+populateTextarea();
 
-  // Salvăm obiectul în local storage sub cheia "feedback-form-state"
-  localStorage.setItem('feedback-form-state', JSON.stringify(formState));
-}
+refs.form.addEventListener('input', throttle(onTextareaInput, 500));
 
-emailInput.addEventListener('input', saveFormState);
-messageTextarea.addEventListener('input', saveFormState);
-
-// task 2: Completăm câmpurile formularului cu datele din local storage la încărcarea paginii
-function populateFormFields() {
-  // Verificăm dacă există date salvate sub cheia "feedback-form-state"
-  const savedState = localStorage.getItem('feedback-form-state');
-
-  if (savedState) {
-    // Dacă există date salvate, le parsăm din JSON și completăm câmpurile formularului
-    const formState = JSON.parse(savedState);
-    emailInput.value = formState.email;
-    messageTextarea.value = formState.message;
-  }
-}
-
-// Ascultăm evenimentul "load" pentru a apela funcția la încărcarea paginii
-window.addEventListener('load', populateFormFields);
-
-// task 3: Ștergem datele din local storage la trimiterea formularului și afișăm datele în consolă
-const form = document.querySelector('.feedback-form');
-
-function clearLocalStorage() {
-  // Ștergem datele sub cheia "feedback-form-state" din local storage
-  localStorage.removeItem('feedback-form-state');
-}
-
-form.addEventListener('submit', function (e) {
+refs.form.addEventListener('submit', e => {
   e.preventDefault();
-
-  // Obținem valorile curente ale câmpurilor email și message
-  const currentEmailValue = emailInput.value;
-  const currentMessageValue = messageTextarea.value;
-
-  // Afișăm în consolă un obiect cu câmpurile și valorile lor curente
-  const formValues = {
-    email: currentEmailValue,
-    message: currentMessageValue,
-  };
-  console.log(formValues);
-
-  // Apelăm funcția pentru ștergerea datelor din local storage
-  clearLocalStorage();
+  e.currentTarget.reset();
+  const objData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  localStorage.removeItem(STORAGE_KEY);
 });
 
-// task 4: Utilizăm throttle pentru a limita apelurile funcției la fiecare 500ms
-const throttledSaveFormState = throttle(saveFormState, 500);
+function onTextareaInput(e) {
+  formData[e.target.name] = e.target.value;
+  const stringifiedData = JSON.stringify(formData);
+  localStorage.setItem(STORAGE_KEY, stringifiedData);
+}
 
-emailInput.addEventListener('input', throttledSaveFormState);
-messageTextarea.addEventListener('input', throttledSaveFormState);
+function populateTextarea() {
+  const savedMessage = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+  if (savedMessage === null) {
+    //console.log(savedMessage);
+    return;
+  }
+  refs.textarea.value = savedMessage['message'] || '';
+  refs.input.value = savedMessage['email'] || '';
+}
+
+// refs.form.addEventListener('input', e => {
+//   //console.log(e.target.name);
+//   //console.log(e.target.value);
+
+//   formData[e.target.name] = e.target.value;
+//   const stringifiedData = JSON.stringify(formData);
+//   localStorage.setItem(STORAGE_KEY, stringifiedData);
+//   console.log(formData);
+// });
+
+// import '../css/common.css';
+// import '../css/03-feedback.css';
+// import throttle from 'lodash.throttle';
+
+// const STORAGE_KEY = 'feedback-form-state';
+// const STORAGE_EMAIL = 'email';
+
+// const refs = {
+//   form: document.querySelector('.feedback-form'),
+//   textarea: document.querySelector('.feedback-form textarea'),
+//   input: document.querySelector('input'),
+// };
+
+// populateTextarea();
+// populateInput();
+
+// refs.form.addEventListener('submit', onFormSubmit);
+// refs.textarea.addEventListener('input', throttle(onTextareaInput, 500));
+// refs.input.addEventListener('input', throttle(onEmailInput, 500));
+
+// function onFormSubmit(e) {
+//   e.preventDefault();
+//   e.currentTarget.reset();
+//   localStorage.removeItem(STORAGE_KEY);
+//   localStorage.removeItem(STORAGE_EMAIL);
+// }
+
+// function onTextareaInput(e) {
+//   const message = e.target.value;
+//   localStorage.setItem(STORAGE_KEY, message);
+// }
+
+// function onEmailInput(e) {
+//   const email = e.target.value;
+//   localStorage.setItem(STORAGE_EMAIL, email);
+// }
+
+// function populateTextarea() {
+//   const savedMessage = localStorage.getItem(STORAGE_KEY);
+
+//   if (savedMessage) {
+//     console.log(savedMessage);
+//     refs.textarea.value = savedMessage;
+//   }
+// }
+
+// function populateInput() {
+//   const savedEmail = localStorage.getItem(STORAGE_EMAIL);
+
+//   if (savedEmail) {
+//     console.log(savedEmail);
+//     refs.input.value = savedEmail;
+//   }
+// }
